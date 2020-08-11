@@ -11,6 +11,7 @@ def test_experiment_exists():
     print("Experiment: " + repr(experiment))
 
     assert experiment is not None, "The experiment Tracking-Example should exist"
+    assert experiment.lifecycle_stage != "deleted", "The experiment must not be deleted"
 
 
 def test_multiple_runs():

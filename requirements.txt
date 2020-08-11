@@ -1,0 +1,9 @@
+pyspark >= 2.2.0
+findspark
+pytest
+pyarrow <= 1.5.0
+mlflow
+mlflow[extras]
+sklearn
+jupyter
+python_http_client

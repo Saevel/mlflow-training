@@ -20,18 +20,20 @@ concepts can largely get you through)
 
 To run this training you will require: 
 
- * Installation of Python 3.6 (3.x should do, but the project was tested against 3.6 so far) as your main python, on the
+ * Installation of Python 3.7 (3.x should do, but the project was tested against 3.7 so far) as your main python, on the
    PATH variable
    
   * Corresponding installation of PyPi available under "pip" on the command line 
  
   * Installation of SQLite: https://www.servermania.com/kb/articles/install-sqlite/
   
-  * An installation of Anaconda compliant with your version of Python for this virtual environment
+  * An installation of Anaconda compliant with your version of Python for this virtual environment, which you need
+    to point towards in the environment.sh / environment.bat
  
   * Installation of Spark 2.4.4 (2.x.x should do, but the project was tested against 2.4.4) with SPARK_HOME
   variable correctly set to that installation, and the installation using the same Python version as you will
-  be using for this tutorial
+  be using for this tutorial, both master and worker which you can set with PYSPARK_PYTHON and PYSPARK_DRIVER_PYTHON
+  environment variables.
  
 ## Setup and run
 
@@ -167,18 +169,22 @@ MLFlow will create those descriptors to then be able to automatically run your m
 
 Use the following command to expose your model via HTTP: 
 
-    mlflow serve -p 5050 --model=uri models:/IrisModel/Staging
+    mlflow models serve -p 5050 --model-uri models:/IrisModel/Staging
     
 which will expose your model via HTTP on the 5050 port. The "Staging" state, can also be replaced by a version in this 
 URI. You can then call your model by sending a POST request to the "http://localhost:5050/invocations" URL, with an
 example body like this:
 
-    {"data":[[6.0, 2.2, 5.0, 1.5], [5.7, 2.9, 4.2, 1.3]]}
+    {"data":[[6.0, 2.2, 5.0, 1.5], [5.7, 2.9, 4.2, 1.3], [0.0, 0.0, 0.0, 0.0]]}
 
 this will be assembled to an two-dimensional NumPy ndarray and passed through the model, producing a response in a 
 corresponding format. If your preprocessing pipeline is bundled with the model, and uses Pandas DataFrame column names,
 you can add a "columns" JSONArray, which will then be factored into assembling a DataFrame for your input and work 
 correctly with such a pipeline.
+
+For this examples, you should receive the response of:
+
+    [1, 1, 0]
 
 Obviously, models exposed like this can then be integrated, through HTTP, into many different envrionments.
 
@@ -188,7 +194,23 @@ Once you have done this, test the correctness of your implementation by running 
 
 ## Model integration with Spark.
 
-    TODO
+You can alternatively use MLFlow registered models to easily integrate your ML models into your Spark piplines as UDFs.
+Open the "src/main/spark/MLFlow-Spark-Integration.ipynb" file to check how this is achieved using the 
+"mlflow.pyfunc.spark_udf" method and a MLFlow URL (which also includes virtual URLs such as "runs:/" and "models:/")
+
+Note that to use the function inside plain text Spark SQL, you need to additionally register it using the "udf" Spark
+SQL method. Also note, that since the MLFlow client API is available for other languages compatible with Spark, like
+Java, Scala and R, you can use your ML Model written in Python as a UDF in pipelines written in those other languages.
+
+Then go tho the "src/main/spark/spark_processor.py" script and implement the "predict_label_with_mlflow_udf" method so 
+that it uses MLFlow UDFs to append a column called "predicted_label" to the input DataFrame, where the predictions 
+should come from the "IrisModel" version currently in the "Staging" stage. 
+
+Once you have done that, run the test from the "src/tests/spark/test_spark_processor.py" script to verify the 
+correctness of your implementation.
+
+
+
 
 
 

@@ -1,6 +1,6 @@
 pip install virtualenv
 
-virtualenv venv --python=python3.6
+virtualenv venv --python=python3.7.4
 
 source venv/bin/activate
 

@@ -1,4 +1,4 @@
-pyspark >= 2.2.0
+pyspark == 2.4.4
 findspark
 pytest
 pyarrow <= 1.5.0

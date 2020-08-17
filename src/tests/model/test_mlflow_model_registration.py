@@ -1,6 +1,6 @@
 import mlflow
 
-# TODO: Change this is you changed the host and / or port for MLFlow
+# TODO: Change this if you changed the host and / or port for MLFlow
 client = mlflow.tracking.MlflowClient(tracking_uri="http://localhost:5000")
 
 
